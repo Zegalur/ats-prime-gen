@@ -8,10 +8,6 @@ staload "divmod.sats"
 staload "mul.sats"
 
 
-typedef prime_tab_func = 
-  {n: pos} {p:pos | p <= n} (PRIME(p) | int p) -> void
-
-
 
 primplement lemma_2_is_prime ()
 = PRIME(PRIME_FOR_bas{2}())
@@ -187,24 +183,19 @@ end
 
 
 (* tabulate all primes <= n *)
-fn tabulate_primes
-  {n: pos}
-  ( n: int n
-  , func: prime_tab_func )
-  : void
-= let
-
-  (*fn tab_5 {n: pos} (n: int n, func: prime_tab_func) : void = ()
-  
-  fn tab_3 {n: pos} (n: int n, func: prime_tab_func) : void = 
-    if n < 3 then ()
-    else let val _ = func{n}(lemma_3_is_prime() | 3)
-         in tab_5(n, func) end
-  
-  fn tab_2 {n: pos} (n: int n, func: prime_tab_func) : void = 
-    if n < 2 then ()
-    else let val _ = func{n}(lemma_2_is_prime() | 2)
-         in tab_3(n, func) end
-  *)
-         
-in (*tab_2(n, func)*) () end
+implement tabulate_primes {n} (n,func)
+=      if n <= 1 then let
+      var _ = func{n,1,2}(n, 1, (lemma_2_is_prime() | 2))
+    in () end
+  else if n <= 2 then let
+      var _ = func{n,1,2}(n, 1, (lemma_2_is_prime() | 2))
+      var _ = func{n,2,3}(n, 2, (lemma_3_is_prime() | 3))
+    in () end
+  else let
+      var _ = func{n,1,2}(n, 1, (lemma_2_is_prime() | 2))
+      var _ = func{n,2,3}(n, 2, (lemma_3_is_prime() | 3))
+      
+      // TODO: add wheel factorization or other sieve
+      
+    in () end
+           

@@ -3,8 +3,16 @@
 staload "isqrt.sats"
 staload "prime.sats"
 
-val n = 1000
-val (pf_sqrt_n | sqrt_n) = isqrt(n)
-val _ = println! ("sqrt(", n, ") = ", sqrt_n)
+fn print_prime 
+  {n,i,p:int | i <= n} 
+  ( n              : int n
+  , i              : int i
+  , (pf_prime | p) : (PRIME(p) | int p) )
+  :<fun1> void
+= let
+  val _ = println! ("p(", i, ") = ", p)
+in () end
+
+val _ = tabulate_primes(1000, print_prime)
 
 implement main0() = ()

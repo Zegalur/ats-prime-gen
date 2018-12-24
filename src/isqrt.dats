@@ -7,63 +7,40 @@ staload "divmod.sats"
 
 
 (* (b >= a) => (b^2 >= a^2) *)
-prfn lemma_sqr_is_monotonic
-  {a, b: nat | b >= a}
-  {a2, b2: nat}
-  ( a: int a
-  , b: int b
-  , pf_a2: MUL(a,a,a2)
-  , pf_b2: MUL(b,b,b2) )
-  : [b2 >= a2] void
+primplement lemma_sqr_is_monotonic {a,b}{a2,b2} (pf_a2,pf_b2)
 = let
   prfun build_b2_from_a2
     {a, b: nat | b >= a}
     {a2: nat}
     .<b>.
-    ( a: int a
-    , b: int b
-    , pf_a2: MUL(a,a,a2) )
+    ( pf_a2: MUL(a,a,a2) )
     : [b2: nat | b2 >= a2] MUL(b,b,b2)
-  = if b > a
+  = sif b > a
       then let  
-        prval pf_bd_bd = build_b2_from_a2(a,b-1,pf_a2)
+        prval pf_bd_bd = build_b2_from_a2{a,b-1}(pf_a2)
         prval pf_b_bd  = MULind(pf_bd_bd)
         prval pf_bd_b  = mul_commute(pf_b_bd)
         prval pf_b_b   = MULind(pf_bd_b)
       in pf_b_b end
       else pf_a2 (* b == a *)
     
-  prval pf_b2r = build_b2_from_a2(a,b,pf_a2)
+  prval pf_b2r = build_b2_from_a2{a,b}(pf_a2)
   prval _ = mul_isfun(pf_b2r, pf_b2)
 in () end
 
 
 (* 0 * n = 0 *)
-prfn lemma_mul_zero_is_zero
-  {n, n0: int}
-  (pf_n0: MUL(0,n,n0))
-  : [n0 == 0] void
+primplement lemma_mul_zero_is_zero {n,n0} (pf_n0)
 = let prval MULbas() = pf_n0 in () end
 
 
 (* n^2 > n for n > 1  *)
-prfun lemma_n2_gt_n_for_n_gt_1
-  {n: nat | n > 1}
-  {n2: nat}
-  .<n>.
-  (n: int n, pf_n2 : MUL(n,n,n2))
-  : [n2 > n] void
+primplement lemma_n2_gt_n_for_n_gt_1 {n}{n2} (pf_n2)
 = let prval _ = mul_pos_pos_pos(pf_n2) in () end
 
 
 (* square of natural number with more specific type *)
-fn sqr_nat 
-  {n: nat} 
-  (n: int n) 
-  : [n2:nat |  (n == 0 && n2 == 0) 
-            || (n == 1 && n2 == 1) 
-            || (n > 1  && n2 > n )] 
-    (MUL(n,n,n2) | int(n2)) 
+implement sqr_nat {n} (n) 
 = let 
   val   (pf_n2 | n2) = g1int_mul2(n,n)
   prval _            = mul_nat_nat_nat(pf_n2)
@@ -78,7 +55,7 @@ in
         prval _ = mul_isfun(pf_n2, pf_11_1)
     in (pf_n2 | n2) end
   else (* n > 1 *)
-    let prval _ = lemma_n2_gt_n_for_n_gt_1(n, pf_n2)
+    let prval _ = lemma_n2_gt_n_for_n_gt_1{n}(pf_n2)
     in (pf_n2 | n2) end
 end
 

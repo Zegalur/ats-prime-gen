@@ -27,6 +27,20 @@ dataprop PRIME (int) =
     of (PRIME_FOR(n,n-1))
     
     
+typedef prime_tab_func = 
+  {n,i,p:pos | i <= n } 
+  (int n, int i, (PRIME(p) | int p)) 
+  -<fun1> void
+  
+  
+(* tabulate all primes <= n *)
+fn tabulate_primes
+  {n: pos}
+  ( n: int n
+  , func: prime_tab_func )
+  : void
+    
+    
 prfn lemma_2_is_prime () : PRIME(2)
 
 

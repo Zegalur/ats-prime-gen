@@ -21,9 +21,7 @@ fn isqrt
 prfn lemma_sqr_is_monotonic
   {a, b: nat | b >= a}
   {a2, b2: nat}
-  ( a: int a
-  , b: int b
-  , pf_a2: MUL(a,a,a2)
+  ( pf_a2: MUL(a,a,a2)
   , pf_b2: MUL(b,b,b2) )
   : [b2 >= a2] void
   
@@ -39,3 +37,28 @@ prfn lemma_isqrt_div
     : [    (i >= isqrt_n+1 && div_ni <= isqrt_n)
         || (i <= isqrt_n   && div_ni >= isqrt_n)
       ] void
+      
+      
+(* n^2 > n for n > 1  *)
+prfn lemma_n2_gt_n_for_n_gt_1
+  {n: nat | n > 1}
+  {n2: nat}
+  (pf_n2 : MUL(n,n,n2))
+  : [n2 > n] void
+  
+  
+(* square of natural number with more specific type *)
+fn sqr_nat 
+  {n: nat} 
+  (n: int n) 
+  : [n2:nat |  (n == 0 && n2 == 0) 
+            || (n == 1 && n2 == 1) 
+            || (n > 1  && n2 > n )] 
+    (MUL(n,n,n2) | int(n2)) 
+    
+    
+(* 0 * n = 0 *)
+prfn lemma_mul_zero_is_zero
+  {n, n0: int}
+  (pf_n0: MUL(0,n,n0))
+  : [n0 == 0] void
