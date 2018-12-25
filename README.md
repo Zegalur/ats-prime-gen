@@ -1,4 +1,4 @@
-# Prime numbers generator with a proof of correctness
+# Prime numbers generator with a formal proof of correctness
 
 Just experimenting with ATS.
 
