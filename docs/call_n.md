@@ -1,4 +1,4 @@
-# How to make sure that function will be called n times (in ATS)
+# How to make sure that function is called n times (in ATS)
 
 Suppose, we need to have a function `loopN(n,func)` that must call `func(0)`, `func(1)`, ..., `func(n-1)` consecutively.
 
