@@ -1,6 +1,6 @@
 # How to make sure that function is called consecutively n times (in ATS)
 
-Suppose, we need to have a function `loopN(n,func)` that must call `func(0)`, `func(1)`, ..., `func(n-1)` consecutively.
+Suppose, we need to have a function `loopN(n,func)` that call `func(0)`, `func(1)`, ..., `func(n-1)` consecutively.
 
 Is it possible somehow formally specify that `func` will be called n times, starting from `func(0)` then `func(1)` and so on? (Ideally, without any overhead)
 
