@@ -183,7 +183,7 @@ end
 
 
 (* tabulate all primes <= n *)
-implement list_primes {pr}{n} (pf0 | n, func)
+implement list_primes {pr}{n} (pf | n, func)
 = let
   prval pf_iprime2   = IPRIMEbas()         // 2 is the first prime number
   prval pf_2is_prime = lemma_2_is_prime()  // 2 is the prime number
@@ -193,17 +193,17 @@ implement list_primes {pr}{n} (pf0 | n, func)
     = IPRIMEind{1}{3}{2}(pf_iprime2, pf_cprime2, pf_3isprime) 
 in    
   if n <= 1 then let
-      val (pf1 | _) = func{n,0,2}(pf_iprime2, pf0 | n, 0, 2)
-    in (pf1 | ()) end
+      val _ = func{n,0,2}(pf_iprime2, pf | n, 0, 2)
+    in () end
   else if n <= 2 then let
-      val (pf1 | _) = func{n,0,2}(pf_iprime2, pf0 | n, 0, 2)
-      val (pf2 | _) = func{n,1,3}(pf_iprime3, pf1 | n, 1, 3)
-    in (pf2 | ()) end
+      val _ = func{n,0,2}(pf_iprime2, pf | n, 0, 2)
+      val _ = func{n,1,3}(pf_iprime3, pf | n, 1, 3)
+    in () end
   else let
-      val (pf1 | _) = func{n,0,2}(pf_iprime2, pf0 | n, 0, 2)
-      val (pf2 | _) = func{n,1,3}(pf_iprime3, pf1 | n, 1, 3)
+      val _ = func{n,0,2}(pf_iprime2, pf | n, 0, 2)
+      val _ = func{n,1,3}(pf_iprime3, pf | n, 1, 3)
       
       // TODO: add wheel factorization or other sieve
       
-    in (pf2 | ()) end
+    in () end
 end

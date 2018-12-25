@@ -3,25 +3,27 @@
 staload "isqrt.sats"
 staload "prime.sats"
 
-dataprop CALL (int, int) =
-  | {n: int}
-	CALLbas(n, 0)
-  | {n, i: int | i <= n}
-	CALLind(n, i) of (CALL(n,i-1))
+dataview CALL (int, int) =
+  | {n: nat}
+    CALLbas(n, 0)
+  | {n, i: nat | i <= n}
+    CALLind(n, i) of (CALL(n,i-1))
 
 fn print_prime 
-  {n,i,p:int | i < n} 
+  {n,i,p:nat | i < n} 
   ( pf_iprime      : IPRIME(i, p)
-  , pfi            : CALL(n, i)
+  , pfi            : !CALL(n,i) >> CALL(n,i+1)
   | n              : int n
   , i              : int i
   , p              : int p )
-  :<fun1> (CALL(n,i+1) | void)
+  :<fun1> void
 = let
-  val      _ = println! ("p(", i, ") = ", p)
-  prval pfi1 = CALLind{n, i+1}(pfi)
-in (pfi1 | ()) end
+  val   _ = println! ("p(", i, ") = ", p)
+  prval _ = pfi := CALLind(pfi)
+in () end
 
-val _ = list_primes(CALLbas | 1000, print_prime)
+prval pf0 = CALLbas
+val _ = list_primes(pf0 | 1000, print_prime)
+
 
 implement main0() = ()

@@ -64,20 +64,24 @@ dataprop IPRIME (int, int) =
     of (IPRIME(i-1, q), CPRIME(p-1,q), PRIME(p))
     
     
-typedef prime_list_func (pr: (int, int) -> prop) = 
+typedef prime_list_func (pr: (int, int) -> view) = 
   {n, i, p : nat | i < n } 
-  (IPRIME(i,p), pr(n,i) | int n, int i, int p)
-  -<fun1> (pr(n,i+1) | void)
+  ( IPRIME(i,p)
+  , !pr(n,i) >> pr(n,i+1)
+  | int n
+  , int i
+  , int p)
+  -<fun1> void
   
   
 (* consecutively get all primes <= n *)
 fn list_primes
-  {pr: (int, int) -> prop }
+  {pr: (int, int) -> view }
   {n:  pos                }
-  ( pf0  : pr(n,0)
+  ( pf0  : !pr(n,0) >> pr(n,n)
   | n    : int n
   , func : prime_list_func(pr) )
-  : (pr(n,n) | void)
+  : void
     
     
 prfn lemma_2_is_prime () : PRIME(2)
