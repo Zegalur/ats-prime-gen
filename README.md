@@ -3,3 +3,6 @@
 Just experimenting with ATS.
 
 To build this project, go to the `build` directory and run `make`.
+
+For additional useful information, go to the `docs` directory.
+

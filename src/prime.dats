@@ -183,19 +183,27 @@ end
 
 
 (* tabulate all primes <= n *)
-implement tabulate_primes {n} (n,func)
-=      if n <= 1 then let
-      var _ = func{n,1,2}(n, 1, (lemma_2_is_prime() | 2))
-    in () end
+implement list_primes {pr}{n} (pf0 | n, func)
+= let
+  prval pf_iprime2   = IPRIMEbas()         // 2 is the first prime number
+  prval pf_2is_prime = lemma_2_is_prime()  // 2 is the prime number
+  prval pf_cprime2   = CPRIMEprime(pf_2is_prime) // 2 is closest prime for 2
+  prval pf_3isprime  = lemma_3_is_prime()  // 3 is prime number
+  prval pf_iprime3                         // 3 is the second prime number
+    = IPRIMEind{1}{3}{2}(pf_iprime2, pf_cprime2, pf_3isprime) 
+in    
+  if n <= 1 then let
+      val (pf1 | _) = func{n,0,2}(pf_iprime2, pf0 | n, 0, 2)
+    in (pf1 | ()) end
   else if n <= 2 then let
-      var _ = func{n,1,2}(n, 1, (lemma_2_is_prime() | 2))
-      var _ = func{n,2,3}(n, 2, (lemma_3_is_prime() | 3))
-    in () end
+      val (pf1 | _) = func{n,0,2}(pf_iprime2, pf0 | n, 0, 2)
+      val (pf2 | _) = func{n,1,3}(pf_iprime3, pf1 | n, 1, 3)
+    in (pf2 | ()) end
   else let
-      var _ = func{n,1,2}(n, 1, (lemma_2_is_prime() | 2))
-      var _ = func{n,2,3}(n, 2, (lemma_3_is_prime() | 3))
+      val (pf1 | _) = func{n,0,2}(pf_iprime2, pf0 | n, 0, 2)
+      val (pf2 | _) = func{n,1,3}(pf_iprime3, pf1 | n, 1, 3)
       
       // TODO: add wheel factorization or other sieve
       
-    in () end
-           
+    in (pf2 | ()) end
+end

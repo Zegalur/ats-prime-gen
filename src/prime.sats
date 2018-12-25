@@ -27,18 +27,57 @@ dataprop PRIME (int) =
     of (PRIME_FOR(n,n-1))
     
     
-typedef prime_tab_func = 
-  {n,i,p:pos | i <= n } 
-  (int n, int i, (PRIME(p) | int p)) 
-  -<fun1> void
+(* COMPOSITE(n) - n is a composite number *)
+dataprop COMPOSITE (int) = 
+  | (* n>1 is composite if it is divisible by
+       some natural number 1<m<n. *)
+    {n: pos | n > 1        }
+    {m: pos | m > 1; m < n }
+    COMPOSITE(n)
+    of (MOD(n,m,0))
+    
+    
+(* CPRIME(n,p) - p is the biggest prime <= n *)
+dataprop CPRIME (int, int) =
+  | (* n is a prime number *)
+    {p: pos | p >= 2}
+    CPRIMEprime(p,p)
+    of (PRIME(p))
+  | (* n is a composite number *)
+    {n: pos | n > 3}
+    {p: pos | p < n}
+    CPRIMEcomp(n,p)
+    of (CPRIME(n-1,p), COMPOSITE(n))
+    
+    
+(* IPRIME(i,p) - p is i-th prime number (i>=0,p>=2) *)
+dataprop IPRIME (int, int) =
+  | (* 2 is the first prime number *)
+    IPRIMEbas(0,2)
+    of ()
+  | (* p is the i-th prime number if closest prime
+       to (p-1) is (i-1)-th prime number *)
+    {i: pos | i > 0 }
+    {p: pos | p > 2 }
+    {q: pos | q > 1 }
+    IPRIMEind(i,p)
+    of (IPRIME(i-1, q), CPRIME(p-1,q), PRIME(p))
+    
+    
+typedef prime_list_func (pr: (int, int) -> prop) = 
+  {n, i, p : nat | i < n } 
+  (IPRIME(i,p), pr(n,i) | int n, int i, int p)
+  -<fun1> (pr(n,i+1) | void)
   
   
-(* tabulate all primes <= n *)
-fn tabulate_primes
-  {n: pos}
-  ( n: int n
-  , func: prime_tab_func )
-  : void
+(* consecutively get all primes <= n *)
+fn list_primes
+  {pr: (int, int) -> prop }
+  {n:  pos                }
+  ( pf0  : pr(n,0)
+  | n    : int n
+  , func : prime_list_func(pr) )
+  : (pr(n,n) | void)
     
     
 prfn lemma_2_is_prime () : PRIME(2)
