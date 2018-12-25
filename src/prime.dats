@@ -248,7 +248,7 @@ implement list_primes {pr}{n} (pf | n, func)
   prval pf_2is_prime = lemma_2_is_prime()        // 2 is the prime number
   prval pf_cprime2   = CPRIMEprime(pf_2is_prime) // 2 is closest prime for 2
   prval pf_3is_prime = lemma_3_is_prime()        // 3 is prime number
-  prval pf_cprime3   = CPRIMEprime(pf_3is_prime) // 3 is closest prime for 2
+  prval pf_cprime3   = CPRIMEprime(pf_3is_prime) // 3 is closest prime for 3
   prval pf_4is_comp  = lemma_4_is_composite()    // 4 is a composite number
   prval pf_cprime4                               // 3 is closest prime for 4
     = CPRIMEcomp(pf_cprime3, pf_4is_comp)
