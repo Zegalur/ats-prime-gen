@@ -1,16 +1,14 @@
-# How to make sure that function is called n times (in ATS)
+# How to make sure that function is called consecutively n times (in ATS)
 
 Suppose, we need to have a function `loopN(n,func)` that must call `func(0)`, `func(1)`, ..., `func(n-1)` consecutively.
 
-In ATS, is it possible somehow formally specify that `func` actually will be called n times, starting from `func(0)` then `func(1)` and so on? (Ideally, without any overhead)
+Is it possible somehow formally specify that `func` will be called n times, starting from `func(0)` then `func(1)` and so on? (Ideally, without any overhead)
 
-What types `func` and `loopN` then should have?
-
-The answer is - it is possible!
+The answer is - yes, it is possible!
 
 ## First Try
 
-First naive idea is to use `dataprop` like this:
+First naive idea is to use `dataprop`:
 
 ```ats
 dataprop CALL (int, int) =
@@ -76,9 +74,9 @@ instead of:
 
     val (pfi1 | _) = f{n,i}(pfi | i)
 
-So, is it possible?
+So, is it even possible?
 
-## The Answer?
+## Almost there
 
 The solution is to parameterize `CALL` (see `(1)`):
 
@@ -154,7 +152,7 @@ typechecking has failed: there are some unsolved constraints: please inspect the
 
 ## The Problem
 
-We still can write and pass the typechecker:
+We still can write this and pass the typechecker:
 
 ```ats
 val          _ = f{n,i}(pfi | i)
@@ -165,7 +163,7 @@ And this is not what we want to be allowed..
 
 ## Linear Types
 
-Luckuly, in ATS we have linear types. If we use `dataview` instead of `dataprop` we finally get the best solution (see `(x)`):
+Luckily, in ATS we have linear types. If we use `dataview` instead of `dataprop` we finally get what we want (see `(x)`):
 
 ```ats
 dataview CALL (int, int) =
@@ -226,7 +224,7 @@ val _ = loopN(pf0 | 10, func)                   // <<==- (x)
 
 ```
 
-Any time we call `f` inside the `loopN` we automatically change `pfi` from `p(n,i)` to `p(n,i+1)`. If we write
+Any time we call `f` inside the `loopN` we automatically change linear `pfi` from `p(n,i)` to `p(n,i+1)`. If we write
 
 ```ats
 val _ = f{n,i}(pfi | i)
