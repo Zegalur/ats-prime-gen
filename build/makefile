@@ -4,7 +4,7 @@ CC = patscc
 BDIR = ../bin
 ODIR = ../obj
 SDIR = ../src
-CFLAGS = #-O2
+CFLAGS = -DATS_MEMALLOC_LIBC #-O2
 
 _OBJS = main_dats.o isqrt_dats.o prime_dats.o \
         divmod_dats.o mul_dats.o

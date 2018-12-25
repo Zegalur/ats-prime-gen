@@ -14,7 +14,10 @@ dataprop SQRT (int, int) =
 fn isqrt 
   {n: nat} 
   (n: int(n)) 
-  : [m: nat] (SQRT(n, m) | int(m))
+  : [m: nat | 
+         (n <= 1 && m == n) 
+      || (n  > 1 && m < n && m > 0)] 
+    (SQRT(n, m) | int(m))
 
 
 (* (b >= a) => (b^2 >= a^2) *)

@@ -18,12 +18,12 @@ fn print_prime
   , p              : int p )
   :<fun1> void
 = let
-  val   _ = println! ("p(", i, ") = ", p)
+  val   _ = println! ("p(", i+1, ") = ", p)
   prval _ = pfi := CALLind(pfi)
 in () end
 
 prval pf0 = CALLbas
-val _ = list_primes(pf0 | 1000, print_prime)
+val _ = list_primes(pf0 | 10000, print_prime)
 
 
 implement main0() = ()

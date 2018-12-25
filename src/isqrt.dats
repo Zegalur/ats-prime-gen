@@ -64,13 +64,13 @@ end
 implement isqrt (n)
 = let
     fun loop
-      {n,a,b: nat | n > 1; a < b}
+      {n,a,b: nat | n > 1; a < b; a < n}
       {a2,b2: nat | a2 <= n; b2 > n}
       .<b-a>.
       ( n: int(n), a: int(a), b: int(b)
       , (pf_a2 | a2): (MUL(a,a,a2) | int(a2))
       , (pf_b2 | b2): (MUL(b,b,b2) | int(b2)) )
-      : [m:nat] (SQRT (n, m) | int(m))
+      : [m:nat | m < n; m > 0] (SQRT (n, m) | int(m))
     = let
       val diff = b - a
     in 
@@ -84,9 +84,9 @@ implement isqrt (n)
             else loop(n, m, b, (pf_m2 | m2), (pf_b2 | b2))
         end
       else (*diff <= 1*) let 
-        val ai              = a + 1
-        val (pf_ai2 | ai2)  = sqr_nat(ai)
-        prval _             = mul_isfun(pf_ai2, pf_b2)
+          val ai              = a + 1
+          val (pf_ai2 | ai2)  = sqr_nat(ai)
+          prval _             = mul_isfun(pf_ai2, pf_b2)
         in (SQRT(pf_a2, pf_ai2) | a) end
     end
 

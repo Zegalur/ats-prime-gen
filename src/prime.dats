@@ -20,6 +20,19 @@ primplement lemma_3_is_prime ()
       prval pf2      = PRIME_FOR_ind{3}{2}{1}(pf1, dmp1)
   in PRIME(pf2) end
 
+primplement lemma_4_is_composite() 
+= let prval pf_dm_4_2 = divmod_make{4,2}{2,0}{4}(mul_make{2,2}())
+  in COMPOSITE(pf_dm_4_2) end
+  
+primplement lemma_5_is_prime ()
+= let prval dm2     = divmod_make{5,2}{2,1}{4}(mul_make{2,2}())
+      prval dm3     = divmod_make{5,3}{1,2}{3}(mul_make{1,3}())
+      prval dm4     = divmod_make{5,4}{1,1}{4}(mul_make{1,4}())
+      prval pf1      = PRIME_FOR_bas()            
+      prval pf2      = PRIME_FOR_ind(pf1, dm2)
+      prval pf3      = PRIME_FOR_ind(pf2, dm3)
+      prval pf4      = PRIME_FOR_ind(pf3, dm4)
+  in PRIME(pf4) end
 
 (*  *)
 prfn lemma_prime_for_mod_gtz
@@ -182,15 +195,71 @@ in loop{n}{isqrt_n}{isqrt_n}
 end
 
 
+datatype PCHECK_RES (int) =
+  | {n : int}
+    PCHECK_prime(n) 
+    of (PRIME(n) | int(n))
+  | {n : int}
+    PCHECK_composite(n)
+    of (COMPOSITE(n) | int(n))
+
+// check if number is prime (slow)
+fn check_if_prime_slow
+  {n : nat | n > 1}
+  ( n : int n )
+  : PCHECK_RES(n)
+= let
+  //
+  fun loop
+    {n : pos | n  > 1 }
+    {s : pos | s  < n }
+    {i : pos | i <= s }
+    .<s-i>.
+    ( pfp : PRIME_FOR(n,i)
+    , pfs : SQRT(n,s)
+    | n   : int n
+    , s   : int s
+    , i   : int i )
+    : PCHECK_RES(n)
+  = if i >= s // i == s
+    then let
+        prval pf_prime = lemma_isqrt_prime_1(pfs, pfp)
+        val r  = PCHECK_prime(pf_prime | n)
+      in r end
+    else let
+        val (pf_dm | n_mod_ip1) = g1int_nmod2(n,i+1) // n mod (i+1)
+      in if n_mod_ip1 > 0 // n mod (i+1) > 0
+        then let
+            prval pfp1 = PRIME_FOR_ind(pfp, pf_dm)
+          in loop{n}{s}{i+1}(pfp1, pfs | n, s, i+1) end
+        else let          // n mod (i+1) == 0
+            prval pf_composite = COMPOSITE{n}{i+1}(pf_dm)
+            val r = PCHECK_composite(pf_composite | n)
+          in r end
+      end
+  //
+  val (pfs | s) = isqrt(n)
+in loop(PRIME_FOR_bas{n}(), pfs | n, s, 1) end
+
 (* tabulate all primes <= n *)
 implement list_primes {pr}{n} (pf | n, func)
 = let
-  prval pf_iprime2   = IPRIMEbas()         // 2 is the first prime number
-  prval pf_2is_prime = lemma_2_is_prime()  // 2 is the prime number
+  //
+  prval pf_2is_prime = lemma_2_is_prime()        // 2 is the prime number
   prval pf_cprime2   = CPRIMEprime(pf_2is_prime) // 2 is closest prime for 2
-  prval pf_3isprime  = lemma_3_is_prime()  // 3 is prime number
+  prval pf_3is_prime = lemma_3_is_prime()        // 3 is prime number
+  prval pf_cprime3   = CPRIMEprime(pf_3is_prime) // 3 is closest prime for 2
+  prval pf_4is_comp  = lemma_4_is_composite()    // 4 is a composite number
+  prval pf_cprime4                               // 3 is closest prime for 4
+    = CPRIMEcomp(pf_cprime3, pf_4is_comp)
+  prval pf_5is_prime = lemma_5_is_prime()        // 5 is the prime number
+  prval pf_cprime5   = CPRIMEprime(pf_5is_prime) // 5 is closest prime for 5
+  //
+  prval pf_iprime2   = IPRIMEbas()         // 2 is the first prime number
   prval pf_iprime3                         // 3 is the second prime number
-    = IPRIMEind{1}{3}{2}(pf_iprime2, pf_cprime2, pf_3isprime) 
+    = IPRIMEind{1}{3}{2}(pf_iprime2, pf_cprime2, pf_3is_prime) 
+  prval pf_iprime5                         // 5 is the third prime number
+    = IPRIMEind{2}{5}{3}(pf_iprime3, pf_cprime4, pf_5is_prime) 
 in    
   if n <= 1 then let
       val _ = func{n,0,2}(pf_iprime2, pf | n, 0, 2)
@@ -199,11 +268,61 @@ in
       val _ = func{n,0,2}(pf_iprime2, pf | n, 0, 2)
       val _ = func{n,1,3}(pf_iprime3, pf | n, 1, 3)
     in () end
-  else let
+  else if n <= 3 then let
       val _ = func{n,0,2}(pf_iprime2, pf | n, 0, 2)
       val _ = func{n,1,3}(pf_iprime3, pf | n, 1, 3)
-      
-      // TODO: add wheel factorization or other sieve
-      
+      val _ = func{n,2,5}(pf_iprime5, pf | n, 2, 5)
     in () end
+  else let // n >= 4, p > 5
+      val _ = func{n,0,2}(pf_iprime2, pf | n, 0, 2)
+      val _ = func{n,1,3}(pf_iprime3, pf | n, 1, 3)
+      val _ = func{n,2,5}(pf_iprime5, pf | n, 2, 5)
+      
+      // TODO: add wheel factorization or other optimization
+      
+      fun loop
+        {pr: (int, int) -> view     } // callback function
+        {n : nat | n >= 4           } // how many primes we need
+        {i : nat | i >= 2; i+1 <= n } // last prime number index (from 0)
+        {q : nat | q >= 5           } // last prime number
+        {p : nat | p >= q           } // last checked number
+        //.<n-i>.
+        ( pf   : !pr(n,i+1) >> pr(n,n)
+        , pfi  : IPRIME(i,q)
+        , pfp  : PRIME(q)
+        , pfc  : CPRIME(p,q)
+        | n    : int n
+        , i    : int i
+        , p    : int p
+        , func : prime_list_func(pr) )
+        : void
+      = if i+1 >= n // i+1 == n
+        then () // we done
+        else let
+          val pcheck = check_if_prime_slow(p+1)
+        in case+ pcheck of
+          | PCHECK_prime(pfp1 | _) => let // p+1 is prime number
+              prval pfi1 = IPRIMEind{i+1}{p+1}{q}(pfi,pfc,pfp1)
+              val      _ = func{n,i+1,p+1}(pfi1, pf | n, i+1, p+1)
+              prval pfc1 = CPRIMEprime{p+1}(pfp1)
+            in loop
+               {pr}{n}{i+1}{p+1}{p+1}
+               ( pf,pfi1,pfp1,pfc1 
+               | n,i+1,p+1,func )
+            end
+          | PCHECK_composite(pf_pp1_comp | _) => let // p+1 is not a prime
+              prval pfc1 = CPRIMEcomp{p+1}{q}(pfc,pf_pp1_comp)
+            in loop
+               {pr}{n}{i}{q}{p+1}
+               ( pf,pfi,pfp,pfc1 
+               | n,i,p+1,func ) 
+            end
+        end
+      //
+      prval pfc = CPRIMEprime{5}(pf_5is_prime)
+    in loop 
+       {pr}{n}{2}{5}{5} 
+       (pf, pf_iprime5, pf_5is_prime, pfc | n, 2, 5, func) 
+    end
+    //in () end
 end

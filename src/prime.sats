@@ -84,10 +84,10 @@ fn list_primes
   : void
     
     
-prfn lemma_2_is_prime () : PRIME(2)
-
-
-prfn lemma_3_is_prime () : PRIME(3)
+prfn lemma_2_is_prime ()    : PRIME(2)
+prfn lemma_3_is_prime ()    : PRIME(3)
+prfn lemma_4_is_composite() : COMPOSITE(4)
+prfn lemma_5_is_prime ()    : PRIME(5)
 
 
 (* if p > q (where p is prime)
